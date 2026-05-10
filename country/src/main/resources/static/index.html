@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Country State City Dropdown</title>
+
+    <style>
+
+        body
+        {
+            font-family: Arial;
+            margin: 50px;
+        }
+
+        select
+        {
+            width: 250px;
+            height: 35px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        label
+        {
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h2>Country State City Dropdown</h2>
+
+<label>Country:</label><br>
+<select id="countries"></select>
+
+<br>
+
+<label>State:</label><br>
+<select id="states"></select>
+
+<br>
+
+<label>City:</label><br>
+<select id="cities"></select>
+
+<script>
+
+    const countryDropdown = document.getElementById("countries");
+    const stateDropdown = document.getElementById("states");
+    const cityDropdown = document.getElementById("cities");
+
+    // Load countries on page load
+    window.onload = function ()
+    {
+        loadCountries();
+    };
+
+    // Load Countries
+    async function loadCountries()
+    {
+        const response = await fetch("http://localhost:8080/getCountries");
+
+        const countries = await response.json();
+
+        countryDropdown.innerHTML = "";
+
+        countries.forEach(country =>
+        {
+            let option = document.createElement("option");
+            option.value = country;
+            option.text = country;
+
+            countryDropdown.appendChild(option);
+        });
+
+        // Load states for first country
+        if (countries.length > 0)
+        {
+            loadStates(countries[0]);
+        }
+    }
+
+    // Load States
+    async function loadStates(country)
+    {
+        const response =
+            await fetch(`http://localhost:8080/getStates?country=${country}`);
+
+        const states = await response.json();
+
+        stateDropdown.innerHTML = "";
+
+        states.forEach(state =>
+        {
+            let option = document.createElement("option");
+            option.value = state;
+            option.text = state;
+
+            stateDropdown.appendChild(option);
+        });
+
+        // Load cities for first state
+        if (states.length > 0)
+        {
+            loadCities(states[0]);
+        }
+    }
+
+    // Load Cities
+    async function loadCities(state)
+    {
+        const response =
+            await fetch(`http://localhost:8080/getCities?state=${state}`);
+
+        const cities = await response.json();
+
+        cityDropdown.innerHTML = "";
+
+        cities.forEach(city =>
+        {
+            let option = document.createElement("option");
+            option.value = city;
+            option.text = city;
+
+            cityDropdown.appendChild(option);
+        });
+    }
+
+    // Country Change Event
+    countryDropdown.addEventListener("change", function ()
+    {
+        loadStates(this.value);
+    });
+
+    // State Change Event
+    stateDropdown.addEventListener("change", function ()
+    {
+        loadCities(this.value);
+    });
+
+</script>
+
+</body>
+</html>
